@@ -291,6 +291,10 @@ MCP2515::ERROR MCP2515::setMode(const CANCTRL_REQOP_MODE mode)
 
 }
 
+uint8_t MCP2515::getMode() {
+    return readRegister(MCP_CANSTAT);
+}
+
 MCP2515::ERROR MCP2515::setBitrate(const CAN_SPEED canSpeed)
 {
     return setBitrate(canSpeed, MCP_16MHZ);
