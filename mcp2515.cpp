@@ -588,6 +588,10 @@ MCP2515::ERROR MCP2515::setBitrate(const CAN_SPEED canSpeed, CAN_CLOCK canClock)
     }
 }
 
+uint8_t MCP2515::getConfig3() {
+    return readRegister(MCP_CNF3);
+}
+
 MCP2515::ERROR MCP2515::setClkOut(const CAN_CLKOUT divisor)
 {
     if (divisor == CLKOUT_DISABLE) {
