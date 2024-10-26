@@ -687,6 +687,7 @@ MCP2515::ERROR MCP2515::setFilter(const RXF num, const bool ext, const uint32_t 
 MCP2515::ERROR MCP2515::sendMessage(const TXBn txbn, const struct can_frame *frame)
 {
     if (frame->can_dlc > CAN_MAX_DLEN) {
+        printf("ERROR_FAILTX\n");
         return ERROR_FAILTX;
     }
 
@@ -710,6 +711,7 @@ MCP2515::ERROR MCP2515::sendMessage(const TXBn txbn, const struct can_frame *fra
 
     uint8_t ctrl = readRegister(txbuf->CTRL);
     if ((ctrl & (TXB_ABTF | TXB_MLOA | TXB_TXERR)) != 0) {
+        printf("ERROR_FAILTX: %dn", ctrl);
         return ERROR_FAILTX;
     }
     return ERROR_OK;
@@ -718,6 +720,7 @@ MCP2515::ERROR MCP2515::sendMessage(const TXBn txbn, const struct can_frame *fra
 MCP2515::ERROR MCP2515::sendMessage(const struct can_frame *frame)
 {
     if (frame->can_dlc > CAN_MAX_DLEN) {
+        printf("ERROR_FAILTX\n");
         return ERROR_FAILTX;
     }
 
@@ -731,6 +734,7 @@ MCP2515::ERROR MCP2515::sendMessage(const struct can_frame *frame)
         }
     }
 
+    printf("ERROR_ALLTXBUSY\n");
     return ERROR_ALLTXBUSY;
 }
 
