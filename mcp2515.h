@@ -457,7 +457,7 @@ private:
 
 public:
     MCP2515(spi_device_handle_t *s);
-    ERROR reset(void);
+    ERROR reset();
     ERROR setConfigMode();
     ERROR setListenOnlyMode();
     ERROR setSleepMode();
@@ -474,16 +474,16 @@ public:
     ERROR sendMessage(const struct can_frame *frame);
     ERROR readMessage(const RXBn rxbn, struct can_frame *frame);
     ERROR readMessage(struct can_frame *frame);
-    bool checkReceive(void);
-    bool checkError(void);
-    uint8_t getErrorFlags(void);
-    void clearRXnOVRFlags(void);
-    uint8_t getInterrupts(void);
-    uint8_t getInterruptMask(void);
-    void clearInterrupts(void);
-    void clearTXInterrupts(void);
-    uint8_t getStatus(void);
-    void clearRXnOVR(void);
+    bool checkReceive();
+    bool checkError();
+    uint8_t getErrorFlags();
+    void clearRXnOVRFlags();
+    uint8_t getInterrupts();
+    uint8_t getInterruptMask();
+    void clearInterrupts();
+    void clearTXInterrupts();
+    uint8_t getStatus();
+    void clearRXnOVR();
     void clearMERR();
     void clearERRIF();
 };

@@ -1,8 +1,6 @@
 #include <string.h>
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "mcp2515.h"
 
 const struct MCP2515::TXBn_REGS MCP2515::TXB[MCP2515::N_TXBUFFERS] = {
@@ -20,11 +18,7 @@ MCP2515::MCP2515(spi_device_handle_t *s) {
     spi = s;
 }
 
-MCP2515::ERROR MCP2515::reset(void) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_RESET);
-    // endSPI();
-
+MCP2515::ERROR MCP2515::reset() {
     spi_transaction_t trans = {};
 
     trans.length = 8;
@@ -64,17 +58,17 @@ MCP2515::ERROR MCP2515::reset(void) {
     RXF filters[] = {RXF0, RXF1, RXF2, RXF3, RXF4, RXF5};
     for (int i = 0; i < 6; i++) {
         bool ext = (i == 1);
-        ERROR result = setFilter(filters[i], ext, 0);
-        if (result != ERROR_OK) {
-            return result;
+        ERROR result2 = setFilter(filters[i], ext, 0);
+        if (result2 != ERROR_OK) {
+            return result2;
         }
     }
 
     MASK masks[] = {MASK0, MASK1};
     for (int i = 0; i < 2; i++) {
-        ERROR result = setFilterMask(masks[i], true, 0);
-        if (result != ERROR_OK) {
-            return result;
+        ERROR result2 = setFilterMask(masks[i], true, 0);
+        if (result2 != ERROR_OK) {
+            return result2;
         }
     }
 
@@ -82,14 +76,6 @@ MCP2515::ERROR MCP2515::reset(void) {
 }
 
 uint8_t MCP2515::readRegister(const REGISTER reg) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_READ);
-    // SPI.transfer(reg);
-    // uint8_t result = SPI.transfer(0x00);
-    // endSPI();
-    //
-    // return result;
-
     spi_transaction_t trans = {};
 
     trans.length = 24;
@@ -107,15 +93,6 @@ uint8_t MCP2515::readRegister(const REGISTER reg) {
 }
 
 void MCP2515::readRegisters(const REGISTER reg, uint8_t values[], const uint8_t n) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_READ);
-    // SPI.transfer(reg);
-    // // mcp2515 has auto-increment of address-pointer
-    // for (uint8_t i=0; i<n; i++) {
-    //     values[i] = SPI.transfer(0x00);
-    // }
-    // endSPI();
-
     uint8_t rx_data[n + 2];
     uint8_t tx_data[n + 2];
 
@@ -140,12 +117,6 @@ void MCP2515::readRegisters(const REGISTER reg, uint8_t values[], const uint8_t 
 }
 
 void MCP2515::setRegister(const REGISTER reg, const uint8_t value) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_WRITE);
-    // SPI.transfer(reg);
-    // SPI.transfer(value);
-    // endSPI();
-
     spi_transaction_t trans = {};
     trans.length = 24;
     trans.flags = SPI_TRANS_USE_RXDATA | SPI_TRANS_USE_TXDATA;
@@ -160,14 +131,6 @@ void MCP2515::setRegister(const REGISTER reg, const uint8_t value) {
 }
 
 void MCP2515::setRegisters(const REGISTER reg, const uint8_t values[], const uint8_t n) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_WRITE);
-    // SPI.transfer(reg);
-    // for (uint8_t i=0; i<n; i++) {
-    //     SPI.transfer(values[i]);
-    // }
-    // endSPI();
-
     uint8_t data[n + 2];
 
     data[0] = INSTRUCTION_WRITE;
@@ -189,13 +152,6 @@ void MCP2515::setRegisters(const REGISTER reg, const uint8_t values[], const uin
 }
 
 void MCP2515::modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_BITMOD);
-    // SPI.transfer(reg);
-    // SPI.transfer(mask);
-    // SPI.transfer(data);
-    // endSPI();
-
     spi_transaction_t trans = {};
 
     trans.length = 32;
@@ -211,14 +167,7 @@ void MCP2515::modifyRegister(const REGISTER reg, const uint8_t mask, const uint8
     }
 }
 
-uint8_t MCP2515::getStatus(void) {
-    // startSPI();
-    // SPI.transfer(INSTRUCTION_READ_STATUS);
-    // uint8_t i = SPI.transfer(0x00);
-    // endSPI();
-    //
-    // return i;
-
+uint8_t MCP2515::getStatus() {
     spi_transaction_t trans = {};
 
     trans.length = 16;
@@ -778,7 +727,7 @@ MCP2515::ERROR MCP2515::readMessage(struct can_frame *frame) {
     return rc;
 }
 
-bool MCP2515::checkReceive(void) {
+bool MCP2515::checkReceive() {
     uint8_t res = getStatus();
     if (res & STAT_RXIF_MASK) {
         return true;
@@ -787,7 +736,7 @@ bool MCP2515::checkReceive(void) {
     }
 }
 
-bool MCP2515::checkError(void) {
+bool MCP2515::checkError() {
     uint8_t eflg = getErrorFlags();
 
     if (eflg & EFLG_ERRORMASK) {
@@ -797,48 +746,43 @@ bool MCP2515::checkError(void) {
     }
 }
 
-uint8_t MCP2515::getErrorFlags(void) {
+uint8_t MCP2515::getErrorFlags() {
     return readRegister(MCP_EFLG);
 }
 
-void MCP2515::clearRXnOVRFlags(void) {
+void MCP2515::clearRXnOVRFlags() {
     modifyRegister(MCP_EFLG, EFLG_RX0OVR | EFLG_RX1OVR, 0);
 }
 
-uint8_t MCP2515::getInterrupts(void) {
+uint8_t MCP2515::getInterrupts() {
     return readRegister(MCP_CANINTF);
 }
 
-void MCP2515::clearInterrupts(void) {
+void MCP2515::clearInterrupts() {
     setRegister(MCP_CANINTF, 0);
 }
 
-uint8_t MCP2515::getInterruptMask(void) {
+uint8_t MCP2515::getInterruptMask() {
     return readRegister(MCP_CANINTE);
 }
 
-void MCP2515::clearTXInterrupts(void) {
+void MCP2515::clearTXInterrupts() {
     modifyRegister(MCP_CANINTF, (CANINTF_TX0IF | CANINTF_TX1IF | CANINTF_TX2IF), 0);
 }
 
-void MCP2515::clearRXnOVR(void) {
+void MCP2515::clearRXnOVR() {
     uint8_t eflg = getErrorFlags();
     if (eflg != 0) {
         clearRXnOVRFlags();
         clearInterrupts();
-        //modifyRegister(MCP_CANINTF, CANINTF_ERRIF, 0);
     }
 
 }
 
 void MCP2515::clearMERR() {
-    //modifyRegister(MCP_EFLG, EFLG_RX0OVR | EFLG_RX1OVR, 0);
-    //clearInterrupts();
     modifyRegister(MCP_CANINTF, CANINTF_MERRF, 0);
 }
 
 void MCP2515::clearERRIF() {
-    //modifyRegister(MCP_EFLG, EFLG_RX0OVR | EFLG_RX1OVR, 0);
-    //clearInterrupts();
     modifyRegister(MCP_CANINTF, CANINTF_ERRIF, 0);
 }
