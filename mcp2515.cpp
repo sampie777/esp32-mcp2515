@@ -31,9 +31,9 @@ MCP2515::ERROR MCP2515::reset(void) {
     trans.flags = SPI_TRANS_USE_RXDATA | SPI_TRANS_USE_TXDATA;
     trans.tx_data[0] = INSTRUCTION_RESET;
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 
     vTaskDelay(pdMS_TO_TICKS(10));
@@ -85,10 +85,10 @@ uint8_t MCP2515::readRegister(const REGISTER reg) {
     // startSPI();
     // SPI.transfer(INSTRUCTION_READ);
     // SPI.transfer(reg);
-    // uint8_t ret = SPI.transfer(0x00);
+    // uint8_t result = SPI.transfer(0x00);
     // endSPI();
     //
-    // return ret;
+    // return result;
 
     spi_transaction_t trans = {};
 
@@ -98,9 +98,9 @@ uint8_t MCP2515::readRegister(const REGISTER reg) {
     trans.tx_data[1] = reg;
     trans.tx_data[2] = 0x00;
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 
     return trans.rx_data[2];
@@ -129,9 +129,9 @@ void MCP2515::readRegisters(const REGISTER reg, uint8_t values[], const uint8_t 
     trans.tx_buffer = tx_data;
 
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 
     for (uint8_t i = 0; i < n; i++) {
@@ -153,9 +153,9 @@ void MCP2515::setRegister(const REGISTER reg, const uint8_t value) {
     trans.tx_data[1] = reg;
     trans.tx_data[2] = value;
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 }
 
@@ -182,9 +182,9 @@ void MCP2515::setRegisters(const REGISTER reg, const uint8_t values[], const uin
     trans.length = ((2 + ((size_t) n)) * 8);
     trans.tx_buffer = data;
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 }
 
@@ -205,9 +205,9 @@ void MCP2515::modifyRegister(const REGISTER reg, const uint8_t mask, const uint8
     trans.tx_data[2] = mask;
     trans.tx_data[3] = data;
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 }
 
@@ -227,9 +227,9 @@ uint8_t MCP2515::getStatus(void) {
     trans.tx_data[1] = 0x00;
 
 
-    esp_err_t ret = spi_device_transmit(*spi, &trans);
-    if (ret != ESP_OK) {
-        printf("spi_device_transmit failed\n");
+    esp_err_t result = spi_device_transmit(*spi, &trans);
+    if (result != ESP_OK) {
+        printf("spi_device_transmit failed: 0x%03x %s\n", result, esp_err_to_name(result));
     }
 
     return trans.rx_data[1];
